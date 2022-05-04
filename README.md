@@ -9,3 +9,9 @@ mvn compile
 ```bash
 mvn spring-boot:run
 ```
+
+## Visit
+
+http://localhost:8080/graphiql
+
+please
