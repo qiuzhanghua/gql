@@ -5,6 +5,8 @@ import com.netflix.graphql.dgs.DgsQuery;
 import com.netflix.graphql.dgs.InputArgument;
 import reactor.core.publisher.Flux;
 
+import static reactor.core.publisher.Flux.fromArray;
+
 @DgsComponent
 public class ShowsDataFetcher {
 
@@ -17,9 +19,9 @@ public class ShowsDataFetcher {
     @DgsQuery
     public Flux<Show> shows(@InputArgument String titleFilter) {
         if (titleFilter == null) {
-            return Flux.fromArray(shows);
+            return fromArray(shows);
         }
-        return Flux.fromArray(shows).filter(s -> s.getTitle().contains(titleFilter));
+        return fromArray(shows).filter(s -> s.getTitle().contains(titleFilter));
     }
 
 }

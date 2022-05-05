@@ -1,8 +1,20 @@
 type Query {
     shows(titleFilter: String): [Show]
+    posts: [Post]
 }
 
 type Show {
     title: String
     releaseYear: Int
+}
+
+type Post {
+    id: ID!
+    title: String
+    content: String
+    createdAt: String
+}
+
+type Mutation {
+    createPost(title: String!, content: String!): Post
 }
