@@ -2,10 +2,9 @@ package com.example.gql;
 
 import org.springframework.stereotype.Component;
 import io.smallrye.mutiny.Uni;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaDelete;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Root;
+
+import javax.persistence.criteria.*;
+import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -70,9 +69,14 @@ public class PostRepository {
                             .replaceWith(post)
             );
         } else {
-            return this.sessionFactory.withSession(session -> session.merge(post).onItem().call(session::flush));
+            return this.sessionFactory.withSession(session -> session.merge(post).onItem().call(session::flush).replaceWith(post));
         }
     }
+
+    public Uni<Post> update(Post post) {
+        return this.sessionFactory.withSession(session -> session.merge(post).onItem().call(session::flush).replaceWith(post));
+    }
+
 
     public Uni<Post[]> saveAll(List<Post> data) {
         Post[] array = data.toArray(new Post[0]);
@@ -84,17 +88,9 @@ public class PostRepository {
     }
 
 //    @Transactional
-//    public Uni<Integer> updateStatus(UUID id, Post.Status status) {
-//        CriteriaBuilder cb = this.sessionFactory.getCriteriaBuilder();
-//        // create update
-//        CriteriaUpdate<Post> delete = cb.createCriteriaUpdate(Post.class);
-//        // set the root class
-//        Root<Post> root = delete.from(Post.class);
-//        // set where clause
-//        delete.set(root.get(Post_.status), status);
-//        delete.where(cb.equal(root.get(Post_.id), id));
-//        // perform update
-//        return this.session.createQuery(delete).executeUpdate();
+//    public Uni<Post> updatePost(UUID id, Post post) {
+//        this.sessionFactory.withSession(session -> session.find(Post.class, id))
+//                .onItem().ifNull().failWith(() -> new PostNotFoundException(id));
 //    }
 
     public Uni<Integer> deleteById(UUID id) {

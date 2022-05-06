@@ -8,24 +8,34 @@ import io.smallrye.mutiny.converters.uni.UniReactorConverters;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.UUID;
+
 @DgsComponent
 class PostDataFetcher {
 
-    private final PostRepository posts;
+    private final PostRepository postRepository;
 
-    PostDataFetcher(PostRepository posts) {
-        this.posts = posts;
+    PostDataFetcher(PostRepository postRepository) {
+        this.postRepository = postRepository;
     }
 
     @DgsQuery
     public Flux<Post> posts() {
-        return posts.findAll().convert().with(UniReactorConverters.toFlux()).flatMap(Flux::fromIterable);
+        return postRepository.findAll().convert().with(UniReactorConverters.toFlux()).flatMap(Flux::fromIterable);
     }
 
     @DgsMutation
     public Mono<Post> createPost(@InputArgument String title, @InputArgument String content) {
-        return posts.save(new Post(title, content)).convert().with(UniReactorConverters.toMono());
+        return postRepository.save(new Post(title, content)).convert().with(UniReactorConverters.toMono());
     }
+    @DgsMutation
+    public Mono<Post> updatePost(@InputArgument String id, @InputArgument String title, @InputArgument String content) {
+        Post post = new Post(title, content);
+        post.setId(UUID.fromString(id));
+        return postRepository.save(post).convert().with(UniReactorConverters.toMono());
+    }
+
+
 
 //    @GetMapping(value = "", produces = MediaType.APPLICATION_JSON_VALUE)
 //    public ResponseEntity<?> all() {
